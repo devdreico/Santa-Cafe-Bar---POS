@@ -5,6 +5,11 @@ El cliente escanea el QR de su mesa, arma su carrito con autosuma y envía la
 comanda directo a cocina/bartender vía **Formspree**. 100% estático (HTML/CSS/JS),
 listo para `santahelenabar.presentto.online`.
 
+**Diseño:** glassmorphism claro (fondo crema, glass con brillo y reflejos,
+blobs animados, animaciones ultra pro). Por mesa solo **2 secciones: Comidas y Bebidas**,
+con bloque **"⭐ Los más pedidos"** arriba y el catálogo continuo debajo
+(3 columnas en desktop, 2 en móvil, encabezados inline de subcategoría).
+
 ## ✨ Funcionalidades
 
 - **20 mesas** con página propia: `santahelenabar.presentto.online/1` … `/20`
@@ -13,9 +18,12 @@ listo para `santahelenabar.presentto.online`.
   (entra directo a **Bebidas → Licores → Cerveza/Destilados**).
 - En cada pantalla, un chip pequeño **"¿Te interesa comer?"** (y **"¿Quieres beber?"**
   al revés) para alternar entre Bebidas y Comidas.
-- **Árbol de menú**:
+- **Árbol de menú** (flujo continuo sin tabs):
   - **Comidas** → Paquetes / Restaurante → productos
-  - **Bebidas** → Licores (Cerveza / Destilados) · Sin Alcohol (Calientes / Frías) → productos
+  - **Bebidas** → Cerveza / Destilados / Calientes / Frías → productos
+- **⭐ Los más pedidos:** bloque destacado al inicio de cada sección alimentado
+  por el flag `masVendido: true` en `assets/js/data.js`
+  (los actuales son placeholders — reemplázalos por los reales cuando los tengas).
 - **Carrito con autosuma instantánea** (barra inferior siempre visible), cantidades ±,
   persistencia por mesa en `localStorage` (no se pierde al recargar).
 - **"Pedir"**: confirma la mesa (auto-detectada, con opción de cambiar) y envía la

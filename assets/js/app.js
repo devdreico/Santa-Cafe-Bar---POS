@@ -1,7 +1,8 @@
 /* ============================================================
-   Santa Elena Café | Bar — App POS (vistas, carrito, pedido)
-   Lee la mesa y la sección desde window.SCB (inyectado por cada
-   página generada) y renderiza todo en #app.
+   Santa Elena Café | Bar — App POS (glass, sin tabs)
+   Por mesa solo 2 secciones: Comidas y Bebidas.
+   Cada sección: hero → "Los más pedidos" → catálogo continuo
+   con encabezados de subcategoría (3 col desktop / 2 col móvil).
    ============================================================ */
 (function () {
   "use strict";
@@ -15,19 +16,50 @@
   var root = document.getElementById("app");
   if (!root) return;
 
-  /* ---------- Estado de vista ---------- */
-  var state = {
-    section: SCB.section, // 'home' | 'bebidasalcohol' | 'comidas'
-    grupo: null,          // 'licores' | 'sinAlcohol' | 'paquetes' | 'restaurante'
-    sub: null             // 'cerveza' | 'destilados' | 'calientes' | 'frias' | null
-  };
+  /* ---------- Tercer blob del fondo ---------- */
+  var blob = document.createElement("div");
+  blob.className = "blob blob--peach";
+  document.body.prepend(blob);
 
-  if (state.section === "bebidasalcohol") {
-    state.grupo = "licores";
-    state.sub = "cerveza";
-  } else if (state.section === "comidas") {
-    state.grupo = "paquetes";
-  }
+  /* ---------- Índice plano de productos ---------- */
+  var PRODUCTOS = {};
+  (function indexar() {
+    function walk(items) {
+      for (var i = 0; i < items.length; i++) PRODUCTOS[items[i].id] = items[i];
+    }
+    walk(DATA.comidas.paquetes.items);
+    walk(DATA.comidas.restaurante.items);
+    walk(DATA.bebidas.licores.cerveza.items);
+    walk(DATA.bebidas.licores.destilados.items);
+    walk(DATA.bebidas.sinAlcohol.calientes.items);
+    walk(DATA.bebidas.sinAlcohol.frias.items);
+  })();
+
+  /* ---------- Definición de las 2 secciones ---------- */
+  var SECCIONES = {
+    bebidasalcohol: {
+      titulo: "Bebidas",
+      emoji: "🥃",
+      subtitulo: "Licores y bebidas sin alcohol",
+      cross: { ir: "comidas", label: "¿Te interesa comer?" },
+      grupos: [
+        { key: "cerveza", label: "Cerveza", icono: "🍺", color: "var(--cat-cerveza)", items: DATA.bebidas.licores.cerveza.items },
+        { key: "destilados", label: "Destilados", icono: "🥃", color: "var(--cat-destilados)", items: DATA.bebidas.licores.destilados.items },
+        { key: "calientes", label: "Calientes", icono: "☕", color: "var(--cat-calientes)", items: DATA.bebidas.sinAlcohol.calientes.items },
+        { key: "frias", label: "Frías", icono: "🧊", color: "var(--cat-frias)", items: DATA.bebidas.sinAlcohol.frias.items }
+      ]
+    },
+    comidas: {
+      titulo: "Comidas",
+      emoji: "🍽️",
+      subtitulo: "Paquetes y carta de restaurante",
+      cross: { ir: "bebidasalcohol", label: "¿Quieres beber?" },
+      grupos: [
+        { key: "paquetes", label: "Paquetes", icono: "🎁", color: "var(--cat-paquetes)", items: DATA.comidas.paquetes.items },
+        { key: "restaurante", label: "Restaurante", icono: "🍽️", color: "var(--cat-restaurante)", items: DATA.comidas.restaurante.items }
+      ]
+    }
+  };
 
   /* ---------- Helpers ---------- */
   function url(mesa, section) {
@@ -60,56 +92,27 @@
     el._t = setTimeout(function () { el.classList.remove("is-show"); }, 1400);
   }
 
-  /* ---------- Estructura del catálogo para la vista actual ---------- */
-  function gruposDeSection() {
-    if (state.section === "comidas") {
-      return [
-        { key: "paquetes", label: DATA.comidas.paquetes.label, subs: null, items: DATA.comidas.paquetes.items },
-        { key: "restaurante", label: DATA.comidas.restaurante.label, subs: null, items: DATA.comidas.restaurante.items }
-      ];
-    }
-    return [
-      {
-        key: "licores",
-        label: DATA.bebidas.licores.label,
-        subs: [
-          { key: "cerveza", label: DATA.bebidas.licores.cerveza.label, items: DATA.bebidas.licores.cerveza.items },
-          { key: "destilados", label: DATA.bebidas.licores.destilados.label, items: DATA.bebidas.licores.destilados.items }
-        ]
-      },
-      {
-        key: "sinAlcohol",
-        label: DATA.bebidas.sinAlcohol.label,
-        subs: [
-          { key: "calientes", label: DATA.bebidas.sinAlcohol.calientes.label, items: DATA.bebidas.sinAlcohol.calientes.items },
-          { key: "frias", label: DATA.bebidas.sinAlcohol.frias.label, items: DATA.bebidas.sinAlcohol.frias.items }
-        ]
+  function seccion() {
+    return SECCIONES[SCB.section] || null;
+  }
+
+  function masVendidosDe(sec) {
+    var out = [];
+    for (var g = 0; g < sec.grupos.length; g++) {
+      var items = sec.grupos[g].items;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].masVendido) out.push(items[i]);
       }
-    ];
-  }
-
-  function grupoActual() {
-    var gs = gruposDeSection();
-    for (var i = 0; i < gs.length; i++) if (gs[i].key === state.grupo) return gs[i];
-    return gs[0];
-  }
-
-  function itemsActuales() {
-    var g = grupoActual();
-    if (!g.subs) return g.items;
-    for (var i = 0; i < g.subs.length; i++) if (g.subs[i].key === state.sub) return g.subs[i].items;
-    return g.subs[0].items;
+    }
+    return out.slice(0, 4);
   }
 
   /* ============================================================
      RENDER
      ============================================================ */
   function render() {
-    if (state.section === "home") {
-      root.innerHTML = renderHome();
-    } else {
-      root.innerHTML = renderHeader() + renderMenu();
-    }
+    var sec = seccion();
+    root.innerHTML = sec ? renderVistaSecccion(sec) : renderHome();
     renderCartbar();
     bind();
   }
@@ -118,19 +121,19 @@
   function renderHome() {
     return (
       '<div class="home">' +
-        '<div class="home__hero">' +
+        '<div class="home__hero shine">' +
           '<img src="' + SCB.base + 'assets/santa-cafe-bar-logo.png" alt="Santa Elena Café | Bar">' +
           "<h1>" + esc(CFG.NOMBRE_LOCAL) + "</h1>" +
-          "<p>¡Bienvenido! Elige qué se te antoja</p>" +
+          "<p>¡Bienvenido! ¿Qué se te antoja?</p>" +
         "</div>" +
         '<div class="home__mesa-banner">📍 Estás pidiendo para la Mesa ' + SCB.mesa + "</div>" +
         '<div class="home__split">' +
-          '<button class="home__choice home__choice--bebidas" data-ir="bebidasalcohol">' +
+          '<button class="home__choice shine" data-ir="bebidasalcohol">' +
             '<span class="emoji">🥃</span>' +
             "<strong>Bebidas</strong>" +
             "<span>Licores y sin alcohol</span>" +
           "</button>" +
-          '<button class="home__choice home__choice--comidas" data-ir="comidas">' +
+          '<button class="home__choice shine" data-ir="comidas">' +
             '<span class="emoji">🍽️</span>' +
             "<strong>Comidas</strong>" +
             "<span>Paquetes y restaurante</span>" +
@@ -140,11 +143,13 @@
     );
   }
 
-  /* ---------- Header ---------- */
-  function renderHeader() {
-    var esBebidas = state.section === "bebidasalcohol";
-    return (
-      '<header class="header">' +
+  /* ---------- Vista de sección ---------- */
+  function renderVistaSecccion(sec) {
+    var esBebidas = SCB.section === "bebidasalcohol";
+
+    // Header
+    var html =
+      '<header class="header glass shine">' +
         '<img class="header__logo" src="' + SCB.base + 'assets/santa-cafe-bar-logo.png" alt="">' +
         '<div class="header__brand">' +
           '<div class="header__title">' + esc(CFG.NOMBRE_LOCAL) + "</div>" +
@@ -155,94 +160,80 @@
       '<nav class="topnav">' +
         '<button class="topnav__btn' + (!esBebidas ? " is-active" : "") + '" data-ir="comidas">🍽️ Comidas</button>' +
         '<button class="topnav__btn' + (esBebidas ? " is-active" : "") + '" data-ir="bebidasalcohol">🥃 Bebidas</button>' +
-      "</nav>"
-    );
-  }
-
-  /* ---------- Menú (tabs + productos) ---------- */
-  function renderMenu() {
-    var esBebidas = state.section === "bebidasalcohol";
-    var titulo = esBebidas ? DATA.bebidas.label : DATA.comidas.label;
-    var subtitulo = esBebidas
-      ? "Licores y bebidas sin alcohol"
-      : "Paquetes y carta de restaurante";
-
-    // Chip cruzado (pequeño)
-    var chip = esBebidas
-      ? '<button class="cross-chip" data-ir="comidas">¿Te interesa comer?</button>'
-      : '<button class="cross-chip" data-ir="bebidasalcohol">¿Quieres beber?</button>';
-
-    // Tabs de grupo (Licores | Sin Alcohol  /  Paquetes | Restaurante)
-    var gs = gruposDeSection();
-    var tabsGrupo = "";
-    for (var i = 0; i < gs.length; i++) {
-      tabsGrupo +=
-        '<button class="tab' + (gs[i].key === state.grupo ? " is-active" : "") + '" data-grupo="' + gs[i].key + '">' +
-        esc(gs[i].label) +
-        "</button>";
-    }
-
-    // Tabs de subcategoría (solo bebidas: Cerveza | Destilados / Calientes | Frías)
-    var g = grupoActual();
-    var tabsSub = "";
-    if (g.subs) {
-      tabsSub = '<div class="tabs">';
-      for (var j = 0; j < g.subs.length; j++) {
-        tabsSub +=
-          '<button class="tab' + (g.subs[j].key === state.sub ? " is-active" : "") + '" data-sub="' + g.subs[j].key + '">' +
-          esc(g.subs[j].label) +
-          "</button>";
-      }
-      tabsSub += "</div>";
-    }
-
-    return (
-      '<div class="section-head">' +
-        '<div class="section-head__titles">' +
-          "<h1>" + esc(titulo) + "</h1>" +
-          "<p>" + esc(subtitulo) + "</p>" +
+      "</nav>" +
+      // Hero
+      '<section class="hero glass shine">' +
+        '<div class="hero__text">' +
+          "<h1>" + esc(sec.titulo) + "</h1>" +
+          "<p>" + esc(sec.subtitulo) + "</p>" +
         "</div>" +
-        chip +
-      "</div>" +
-      '<div class="tabs">' + tabsGrupo + "</div>" +
-      tabsSub +
-      '<div class="grid">' + renderCards(itemsActuales()) + "</div>"
-    );
-  }
+        '<button class="cross-chip" data-ir="' + sec.cross.ir + '">' + esc(sec.cross.label) + "</button>" +
+      "</section>";
 
-  function renderCards(items) {
-    var html = "";
-    for (var i = 0; i < items.length; i++) {
-      var p = items[i];
-      var qty = Cart.qtyOf(p.id);
+    // Los más pedidos
+    var best = masVendidosDe(sec);
+    if (best.length > 0) {
       html +=
-        '<article class="card" data-add="' + p.id + '">' +
-          (qty > 0 ? '<span class="card__badge">' + qty + "</span>" : "") +
-          '<div class="card__name">' + esc(p.nombre) + "</div>" +
-          '<div class="card__desc">' + esc(p.desc) + "</div>" +
-          '<div class="card__row">' +
-            '<span class="card__price">' + fmt(p.precio) + "</span>" +
-            '<button class="card__add" data-add-btn="' + p.id + '" aria-label="Agregar ' + esc(p.nombre) + '">+</button>' +
-          "</div>" +
-        "</article>";
+        '<section class="best">' +
+          '<div class="best__head"><span class="spark">⭐</span><h2>Los más pedidos</h2></div>' +
+          '<div class="best__strip">';
+      for (var i = 0; i < best.length; i++) {
+        html += renderBestCard(best[i], i);
+      }
+      html += "</div></section>";
     }
+
+    // Catálogo continuo con encabezados inline
+    html += '<section class="catalog">';
+    for (var g = 0; g < sec.grupos.length; g++) {
+      var grupo = sec.grupos[g];
+      html +=
+        '<div class="cat">' +
+          '<div class="cat-head" style="--cat-color:' + grupo.color + ';animation-delay:' + (g * 60) + 'ms">' +
+            '<span class="cat-head__dot"></span>' +
+            "<h3>" + grupo.icono + " " + esc(grupo.label) + "</h3>" +
+            "<span>" + grupo.items.length + " opciones</span>" +
+          "</div>" +
+          '<div class="grid">';
+      for (var j = 0; j < grupo.items.length; j++) {
+        html += renderCard(grupo.items[j], g * 4 + j);
+      }
+      html += "</div></div>";
+    }
+    html += "</section>";
+
     return html;
   }
 
-  function findProduct(id) {
-    var gs = gruposDeSection();
-    for (var i = 0; i < gs.length; i++) {
-      var g = gs[i];
-      if (g.subs) {
-        for (var j = 0; j < g.subs.length; j++) {
-          var its = g.subs[j].items;
-          for (var k = 0; k < its.length; k++) if (its[k].id === id) return its[k];
-        }
-      } else {
-        for (var m = 0; m < g.items.length; m++) if (g.items[m].id === id) return g.items[m];
-      }
-    }
-    return null;
+  function renderBestCard(p, idx) {
+    var qty = Cart.qtyOf(p.id);
+    return (
+      '<article class="best-card shine" data-add="' + p.id + '" style="animation-delay:' + (150 + idx * 70) + 'ms">' +
+        (qty > 0 ? '<span class="card__badge">' + qty + "</span>" : "") +
+        '<span class="best-card__tag">Top</span>' +
+        '<div class="best-card__name">' + esc(p.nombre) + "</div>" +
+        '<div class="best-card__desc">' + esc(p.desc) + "</div>" +
+        '<div class="best-card__row">' +
+          '<span class="best-card__price">' + fmt(p.precio) + "</span>" +
+          '<button class="card__add" data-add-btn="' + p.id + '" aria-label="Agregar ' + esc(p.nombre) + '">+</button>' +
+        "</div>" +
+      "</article>"
+    );
+  }
+
+  function renderCard(p, idx) {
+    var qty = Cart.qtyOf(p.id);
+    return (
+      '<article class="card" data-add="' + p.id + '" style="animation-delay:' + Math.min(idx * 35, 500) + 'ms">' +
+        (qty > 0 ? '<span class="card__badge">' + qty + "</span>" : "") +
+        '<div class="card__name">' + esc(p.nombre) + "</div>" +
+        '<div class="card__desc">' + esc(p.desc) + "</div>" +
+        '<div class="card__row">' +
+          '<span class="card__price">' + fmt(p.precio) + "</span>" +
+          '<button class="card__add" data-add-btn="' + p.id + '" aria-label="Agregar ' + esc(p.nombre) + '">+</button>' +
+        "</div>" +
+      "</article>"
+    );
   }
 
   /* ---------- Barra inferior del carrito ---------- */
@@ -268,13 +259,19 @@
     });
   }
 
+  function bumpCartbar() {
+    var btn = document.getElementById("cartbar-btn");
+    if (!btn) return;
+    btn.classList.remove("bump");
+    void btn.offsetWidth;
+    btn.classList.add("bump");
+  }
+
   /* ---------- Drawer del carrito ---------- */
   function openDrawer() {
-    var overlay = document.getElementById("overlay");
-    var drawer = document.getElementById("drawer");
+    document.getElementById("overlay").classList.add("is-open");
+    document.getElementById("drawer").classList.add("is-open");
     renderDrawerBody();
-    overlay.classList.add("is-open");
-    drawer.classList.add("is-open");
   }
 
   function closeDrawer() {
@@ -338,7 +335,7 @@
   }
 
   /* ---------- Modal: confirmar pedido / mesa ---------- */
-  var mesaPedido = SCB.mesa; // mesa usada para el pedido (auto-detectada)
+  var mesaPedido = SCB.mesa;
 
   function openConfirm() {
     mesaPedido = SCB.mesa;
@@ -415,15 +412,17 @@
         showExito(res.demo);
         Cart.clear();
       })
-      .catch(function (err) {
-        showError(Order.textoComanda(mesaPedido, items, total), err.message);
+      .catch(function () {
+        showError(Order.textoComanda(mesaPedido, items, total));
       });
   }
 
   function showExito(demo) {
     document.getElementById("modal").innerHTML =
       '<div class="modal__card">' +
-        '<div class="modal__icon modal__icon--ok">✓</div>' +
+        '<div class="modal__icon modal__icon--ok">' +
+          '<svg class="check-svg" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19"/><path d="M13 22.5l6 6 12-13"/></svg>' +
+        "</div>" +
         "<h2>¡Comanda enviada!</h2>" +
         "<p>Cocina y bar ya recibieron tu pedido.<br>La mesa es la <strong>Mesa " + mesaPedido + "</strong>.</p>" +
         (demo ? '<p style="font-size:12px;margin-top:8px;">(modo demo: no se envió a Formspree todavía — configura tu endpoint en <code>config.js</code>)</p>' : "") +
@@ -434,7 +433,7 @@
     document.getElementById("btn-seguir").addEventListener("click", closeModal);
   }
 
-  function showError(texto, motivo) {
+  function showError(texto) {
     var wa = Order.linkWhatsApp(texto);
     document.getElementById("modal").innerHTML =
       '<div class="modal__card">' +
@@ -449,9 +448,7 @@
         "</div>" +
       "</div>";
 
-    document.getElementById("btn-reintentar").addEventListener("click", function () {
-      renderConfirm();
-    });
+    document.getElementById("btn-reintentar").addEventListener("click", renderConfirm);
     document.getElementById("btn-cerrar-err").addEventListener("click", closeModal);
     document.getElementById("btn-copiar").addEventListener("click", function () {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -467,61 +464,49 @@
     });
   }
 
-  /* ---------- Eventos globales ---------- */
+  /* ---------- Eventos ---------- */
   function bind() {
     root.querySelectorAll("[data-ir]").forEach(function (b) {
       b.addEventListener("click", function () { irA(b.getAttribute("data-ir")); });
     });
 
-    root.querySelectorAll("[data-grupo]").forEach(function (b) {
-      b.addEventListener("click", function () {
-        state.grupo = b.getAttribute("data-grupo");
-        var g = grupoActual();
-        state.sub = g.subs ? g.subs[0].key : null;
-        render();
-      });
-    });
-
-    root.querySelectorAll("[data-sub]").forEach(function (b) {
-      b.addEventListener("click", function () {
-        state.sub = b.getAttribute("data-sub");
-        render();
-      });
-    });
-
     root.querySelectorAll("[data-add]").forEach(function (card) {
-      card.addEventListener("click", function (e) {
+      card.addEventListener("click", function () {
         var id = card.getAttribute("data-add");
-        var p = findProduct(id);
+        var p = PRODUCTOS[id];
         if (!p) return;
         Cart.add(p);
         toast("＋ " + p.nombre);
+        var btn = card.querySelector(".card__add");
+        if (btn) {
+          btn.classList.remove("pulse");
+          void btn.offsetWidth;
+          btn.classList.add("pulse");
+        }
       });
     });
   }
 
-  /* ---------- Suscripción a cambios del carrito ---------- */
+  /* ---------- Cambios del carrito ---------- */
   Cart.onChange(function () {
-    // Actualiza badges de productos + barra + drawer si está abierto
-    if (state.section !== "home") {
-      root.querySelectorAll(".card").forEach(function (card) {
-        var id = card.getAttribute("data-add");
-        var qty = Cart.qtyOf(id);
-        var badge = card.querySelector(".card__badge");
-        if (qty > 0) {
-          if (badge) badge.textContent = qty;
-          else {
-            var span = document.createElement("span");
-            span.className = "card__badge";
-            span.textContent = qty;
-            card.appendChild(span);
-          }
-        } else if (badge) {
-          badge.remove();
+    root.querySelectorAll("[data-add]").forEach(function (card) {
+      var id = card.getAttribute("data-add");
+      var qty = Cart.qtyOf(id);
+      var badge = card.querySelector(".card__badge");
+      if (qty > 0) {
+        if (badge) badge.textContent = qty;
+        else {
+          var span = document.createElement("span");
+          span.className = "card__badge";
+          span.textContent = qty;
+          card.appendChild(span);
         }
-      });
-    }
+      } else if (badge) {
+        badge.remove();
+      }
+    });
     renderCartbar();
+    bumpCartbar();
     var drawer = document.getElementById("drawer");
     if (drawer && drawer.classList.contains("is-open")) renderDrawerBody();
   });

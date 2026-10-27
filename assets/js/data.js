@@ -1,5 +1,8 @@
 /* ============================================================
    Santa Elena Café | Bar — Catálogo simulado (precios COP)
+   `masVendido: true` → aparece en el bloque "⭐ Los más pedidos".
+   NOTA: los actuales son PLACEHOLDERS — reemplazar por los
+   productos reales más vendidos cuando se confirme la lista.
    ============================================================ */
 window.SCB_DATA = {
   comidas: {
@@ -8,7 +11,7 @@ window.SCB_DATA = {
     paquetes: {
       label: "Paquetes",
       items: [
-        { id: "paq-piqueo-pareja", nombre: "Piqueo para dos", desc: "Tequeños, nachos, alitas y papas", precio: 38000 },
+        { id: "paq-piqueo-pareja", nombre: "Piqueo para dos", desc: "Tequeños, nachos, alitas y papas", precio: 38000, masVendido: true },
         { id: "paq-desayuno", nombre: "Desayuno parejo", desc: "2 arepas, 2 huevos, queso, café", precio: 25000 },
         { id: "paq-parrilla", nombre: "Parrilla pareja", desc: "Carne, pollo, arepas y ensalada", precio: 55000 },
         { id: "paq-deportivo", nombre: "Combo deportivo", desc: "4 cervezas + piqueo mixto", precio: 45000 },
@@ -19,9 +22,9 @@ window.SCB_DATA = {
     restaurante: {
       label: "Restaurante",
       items: [
-        { id: "res-arepa-pabellon", nombre: "Arepa de pabellón", desc: "Carne mechada, caraotas y plátano", precio: 18000 },
-        { id: "res-tequenos", nombre: "Tequeños (8 u.)", desc: "Con salsa de la casa", precio: 12000 },
-        { id: "res-hamburguesa", nombre: "Hamburguesa completa", desc: "Carne, queso, tocineta y papas", precio: 22000 },
+        { id: "res-arepa-pabellon", nombre: "Arepa de pabellón", desc: "Carne mechada, caraotas y plátano", precio: 18000, masVendido: true },
+        { id: "res-tequenos", nombre: "Tequeños (8 u.)", desc: "Con salsa de la casa", precio: 12000, masVendido: true },
+        { id: "res-hamburguesa", nombre: "Hamburguesa completa", desc: "Carne, queso, tocineta y papas", precio: 22000, masVendido: true },
         { id: "res-patacon", nombre: "Patacón con todo", desc: "Patacón, carne, queso y guasacaca", precio: 20000 },
         { id: "res-cachapa", nombre: "Cachapa con queso", desc: "Cachapa tradicional con queso de mano", precio: 16000 },
         { id: "res-empanadas", nombre: "Empanadas (3 u.)", desc: "Carne mechada, con ají", precio: 10000 },
@@ -41,7 +44,7 @@ window.SCB_DATA = {
       cerveza: {
         label: "Cerveza",
         items: [
-          { id: "cer-polar-400", nombre: "Polar 400 ml", desc: "Lager clásica bien fría", precio: 4500 },
+          { id: "cer-polar-400", nombre: "Polar 400 ml", desc: "Lager clásica bien fría", precio: 4500, masVendido: true },
           { id: "cer-polar-light", nombre: "Polar Light 400 ml", desc: "Ligera, refrescante", precio: 4500 },
           { id: "cer-pilsen", nombre: "Pilsen 400 ml", desc: "Cerveza premium", precio: 5000 },
           { id: "cer-club-colombia", nombre: "Club Colombia 330 ml", desc: "Rubia, sabor suave", precio: 5500 },
@@ -56,7 +59,7 @@ window.SCB_DATA = {
       destilados: {
         label: "Destilados",
         items: [
-          { id: "des-ron-st-70", nombre: "Ron Santa Teresa 70", desc: "Servido en copa 60 ml", precio: 12000 },
+          { id: "des-ron-st-70", nombre: "Ron Santa Teresa 70", desc: "Servido en copa 60 ml", precio: 12000, masVendido: true },
           { id: "des-diplomatico", nombre: "Diplomático Reserva", desc: "Copa 60 ml", precio: 18000 },
           { id: "des-old-parr", nombre: "Old Parr 12 años", desc: "Copa 60 ml", precio: 20000 },
           { id: "des-absolut", nombre: "Absolut Vodka", desc: "Copa 60 ml", precio: 15000 },
@@ -77,7 +80,7 @@ window.SCB_DATA = {
         label: "Calientes",
         items: [
           { id: "ca-americano", nombre: "Café americano", desc: "Espresso doble con agua", precio: 6500 },
-          { id: "ca-capuchino", nombre: "Capuchino", desc: "Espresso con leche vaporizada", precio: 8000 },
+          { id: "ca-capuchino", nombre: "Capuchino", desc: "Espresso con leche vaporizada", precio: 8000, masVendido: true },
           { id: "ca-latte", nombre: "Café latte", desc: "Suave, con espuma de leche", precio: 8000 },
           { id: "ca-moca", nombre: "Moca", desc: "Café, chocolate y crema", precio: 8500 },
           { id: "ca-avena", nombre: "Avena caliente", desc: "Tradicional, con canela", precio: 7000 },
@@ -89,7 +92,7 @@ window.SCB_DATA = {
       frias: {
         label: "Frías",
         items: [
-          { id: "fr-limonada-coco", nombre: "Limonada de coco", desc: "La más pedida", precio: 9000 },
+          { id: "fr-limonada-coco", nombre: "Limonada de coco", desc: "La más pedida", precio: 9000, masVendido: true },
           { id: "fr-limonada", nombre: "Limonada natural", desc: "Con hierbabuena", precio: 8000 },
           { id: "fr-mora", nombre: "Jugo de mora", desc: "Natural, 500 ml", precio: 8000 },
           { id: "fr-parchita", nombre: "Jugo de parchita", desc: "Natural, 500 ml", precio: 8000 },
