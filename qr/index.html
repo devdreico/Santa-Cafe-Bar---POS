@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1210">
+  <title>QRs por mesa — Santa Elena Café | Bar</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+  <div class="qr-page">
+    <h1>📱 Códigos QR por mesa</h1>
+    <p class="lead">
+      Imprime estos códigos y colócalos en cada mesa. Al escanearlos, el cliente entra
+      directo al apartado <strong>Bebidas con licor</strong> de su mesa (ej: <code>/2/bebidasalcohol</code>).
+    </p>
+
+    <div class="qr-page__actions">
+      <button id="btn-print">🖨️ Imprimir / Guardar PDF</button>
+      <button id="btn-reload">🔄 Regenerar</button>
+    </div>
+
+    <div class="qr-grid" id="grid"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    (function () {
+      var MESAS = 20;
+      var grid = document.getElementById("grid");
+
+      function generar() {
+        grid.innerHTML = "";
+        if (typeof QRCode === "undefined") {
+          grid.innerHTML = '<p style="color:var(--danger);grid-column:1/-1;">No se pudo cargar la librería de QR (necesitas conexión a internet). Recarga la página.</p>';
+          return;
+        }
+        for (var i = 1; i <= MESAS; i++) {
+          var href = new URL("../" + i + "/bebidasalcohol/", document.baseURI).href;
+          var card = document.createElement("div");
+          card.className = "qr-card";
+          card.innerHTML = '<h3>Mesa ' + i + "</h3>";
+          var qrDiv = document.createElement("div");
+          card.appendChild(qrDiv);
+          var urlEl = document.createElement("div");
+          urlEl.className = "url";
+          urlEl.textContent = href.replace(/^https?:\/\//, "");
+          card.appendChild(urlEl);
+          grid.appendChild(card);
+          new QRCode(qrDiv, {
+            text: href,
+            width: 120,
+            height: 120,
+            colorDark: "#1a1210",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        }
+      }
+
+      document.getElementById("btn-print").addEventListener("click", function () { window.print(); });
+      document.getElementById("btn-reload").addEventListener("click", generar);
+      generar();
+    })();
+  </script>
+</body>
+</html>

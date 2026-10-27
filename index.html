@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1210">
+  <title>Santa Elena Café | Bar — Elige tu mesa</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="root">
+    <div class="root__hero">
+      <img src="assets/santa-cafe-bar-logo.png" alt="Santa Elena Café | Bar">
+      <h1>Santa Elena Café | Bar</h1>
+      <p>Menú digital y pedidos desde tu mesa.<br>¡Bienvenido!</p>
+    </div>
+
+    <div class="root__label">¿En qué mesa te encuentras?</div>
+    <div class="root__grid" id="mesas"></div>
+
+    <div class="root__foot">
+      💡 Si estás en tu mesa, escanea el <strong>QR</strong> y entrarás directo al menú de bebidas.
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var MESAS = 20;
+      var grid = document.getElementById("mesas");
+      var html = "";
+      for (var i = 1; i <= MESAS; i++) {
+        html += '<a href="' + i + '/">Mesa ' + i + "<small>Entrar</small></a>";
+      }
+      grid.innerHTML = html;
+    })();
+  </script>
+</body>
+</html>
