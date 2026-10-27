@@ -5,10 +5,12 @@ El cliente escanea el QR de su mesa, arma su carrito con autosuma y envía la
 comanda directo a cocina/bartender vía **Formspree**. 100% estático (HTML/CSS/JS),
 listo para `santahelenabar.presentto.online`.
 
-**Diseño:** glassmorphism claro (fondo crema, glass con brillo y reflejos,
-blobs animados, animaciones ultra pro). Por mesa solo **2 secciones: Comidas y Bebidas**,
-con bloque **"⭐ Los más pedidos"** arriba y el catálogo continuo debajo
-(3 columnas en desktop, 2 en móvil, encabezados inline de subcategoría).
+**Diseño:** minimalista oscuro (fondo espresso, glass sutil, acentos pastel
+naranja/café, tipografía **Montserrat bold**). Header centrado con logo grande.
+Por mesa solo **2 secciones: Comidas y Bebidas**, con bloque **"⭐ Los más pedidos"**
+arriba y el catálogo continuo debajo (3 columnas desktop / 2 móvil).
+Cada card tiene **espacio para 1 foto** (placeholder hasta asignar `img` en
+`data.js`) y solo el botón **"Agregar al pedido"** reacciona al clic.
 
 ## ✨ Funcionalidades
 

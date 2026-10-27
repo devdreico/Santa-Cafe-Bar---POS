@@ -1,6 +1,8 @@
 /* ============================================================
    Santa Elena Café | Bar — Catálogo simulado (precios COP)
-   `masVendido: true` → aparece en el bloque "⭐ Los más pedidos".
+   `masVendido: true` → aparece en el bloque "Los más pedidos".
+   `img: "ruta.jpg"`  → foto del producto (opcional; si se omite
+   o es null, la card muestra un placeholder con icono de cámara).
    NOTA: los actuales son PLACEHOLDERS — reemplazar por los
    productos reales más vendidos cuando se confirme la lista.
    ============================================================ */

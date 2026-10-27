@@ -121,19 +121,19 @@
   function renderHome() {
     return (
       '<div class="home">' +
-        '<div class="home__hero shine">' +
+        '<div class="home__hero">' +
           '<img src="' + SCB.base + 'assets/santa-cafe-bar-logo.png" alt="Santa Elena Café | Bar">' +
           "<h1>" + esc(CFG.NOMBRE_LOCAL) + "</h1>" +
           "<p>¡Bienvenido! ¿Qué se te antoja?</p>" +
         "</div>" +
         '<div class="home__mesa-banner">📍 Estás pidiendo para la Mesa ' + SCB.mesa + "</div>" +
         '<div class="home__split">' +
-          '<button class="home__choice shine" data-ir="bebidasalcohol">' +
+          '<button class="home__choice" data-ir="bebidasalcohol">' +
             '<span class="emoji">🥃</span>' +
             "<strong>Bebidas</strong>" +
             "<span>Licores y sin alcohol</span>" +
           "</button>" +
-          '<button class="home__choice shine" data-ir="comidas">' +
+          '<button class="home__choice" data-ir="comidas">' +
             '<span class="emoji">🍽️</span>' +
             "<strong>Comidas</strong>" +
             "<span>Paquetes y restaurante</span>" +
@@ -147,22 +147,20 @@
   function renderVistaSecccion(sec) {
     var esBebidas = SCB.section === "bebidasalcohol";
 
-    // Header
+    // Header centrado con logo grande
     var html =
-      '<header class="header glass shine">' +
+      '<header class="header">' +
         '<img class="header__logo" src="' + SCB.base + 'assets/santa-cafe-bar-logo.png" alt="">' +
-        '<div class="header__brand">' +
-          '<div class="header__title">' + esc(CFG.NOMBRE_LOCAL) + "</div>" +
-          '<div class="header__subtitle">Menú digital</div>' +
-        "</div>" +
+        '<div class="header__title">' + esc(CFG.NOMBRE_LOCAL) + "</div>" +
+        '<div class="header__subtitle">Menú digital</div>' +
         '<div class="header__mesa">Mesa ' + SCB.mesa + "</div>" +
       "</header>" +
       '<nav class="topnav">' +
-        '<button class="topnav__btn' + (!esBebidas ? " is-active" : "") + '" data-ir="comidas">🍽️ Comidas</button>' +
-        '<button class="topnav__btn' + (esBebidas ? " is-active" : "") + '" data-ir="bebidasalcohol">🥃 Bebidas</button>' +
+        '<button class="topnav__btn' + (!esBebidas ? " is-active" : "") + '" data-ir="comidas">Comidas</button>' +
+        '<button class="topnav__btn' + (esBebidas ? " is-active" : "") + '" data-ir="bebidasalcohol">Bebidas</button>' +
       "</nav>" +
       // Hero
-      '<section class="hero glass shine">' +
+      '<section class="hero glass">' +
         '<div class="hero__text">' +
           "<h1>" + esc(sec.titulo) + "</h1>" +
           "<p>" + esc(sec.subtitulo) + "</p>" +
@@ -175,7 +173,7 @@
     if (best.length > 0) {
       html +=
         '<section class="best">' +
-          '<div class="best__head"><span class="spark">⭐</span><h2>Los más pedidos</h2></div>' +
+          '<div class="best__head"><h2>⭐ Los más pedidos</h2></div>' +
           '<div class="best__strip">';
       for (var i = 0; i < best.length; i++) {
         html += renderBestCard(best[i], i);
@@ -205,33 +203,42 @@
     return html;
   }
 
-  function renderBestCard(p, idx) {
-    var qty = Cart.qtyOf(p.id);
+  function fotoHtml(p, clase) {
+    if (p.img) {
+      return '<div class="' + clase + '"><img src="' + esc(p.img) + '" alt="' + esc(p.nombre) + '" loading="lazy"></div>';
+    }
     return (
-      '<article class="best-card shine" data-add="' + p.id + '" style="animation-delay:' + (150 + idx * 70) + 'ms">' +
-        (qty > 0 ? '<span class="card__badge">' + qty + "</span>" : "") +
+      '<div class="' + clase + '">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+          '<rect x="3" y="6" width="18" height="14" rx="2.5"/>' +
+          '<circle cx="12" cy="13" r="3.6"/>' +
+          '<path d="M8 6l1.2-2h5.6L16 6"/>' +
+        "</svg>" +
+      "</div>"
+    );
+  }
+
+  function renderBestCard(p, idx) {
+    return (
+      '<article class="best-card" style="animation-delay:' + (150 + idx * 70) + 'ms">' +
         '<span class="best-card__tag">Top</span>' +
+        fotoHtml(p, "card__photo") +
         '<div class="best-card__name">' + esc(p.nombre) + "</div>" +
-        '<div class="best-card__desc">' + esc(p.desc) + "</div>" +
         '<div class="best-card__row">' +
           '<span class="best-card__price">' + fmt(p.precio) + "</span>" +
-          '<button class="card__add" data-add-btn="' + p.id + '" aria-label="Agregar ' + esc(p.nombre) + '">+</button>' +
         "</div>" +
+        '<button class="btn-add" data-add-btn="' + p.id + '">Agregar al pedido</button>' +
       "</article>"
     );
   }
 
   function renderCard(p, idx) {
-    var qty = Cart.qtyOf(p.id);
     return (
-      '<article class="card" data-add="' + p.id + '" style="animation-delay:' + Math.min(idx * 35, 500) + 'ms">' +
-        (qty > 0 ? '<span class="card__badge">' + qty + "</span>" : "") +
+      '<article class="card" style="animation-delay:' + Math.min(idx * 35, 500) + 'ms">' +
+        fotoHtml(p, "card__photo") +
         '<div class="card__name">' + esc(p.nombre) + "</div>" +
-        '<div class="card__desc">' + esc(p.desc) + "</div>" +
-        '<div class="card__row">' +
-          '<span class="card__price">' + fmt(p.precio) + "</span>" +
-          '<button class="card__add" data-add-btn="' + p.id + '" aria-label="Agregar ' + esc(p.nombre) + '">+</button>' +
-        "</div>" +
+        '<div class="card__price">' + fmt(p.precio) + "</div>" +
+        '<button class="btn-add" data-add-btn="' + p.id + '">Agregar al pedido</button>' +
       "</article>"
     );
   }
@@ -464,47 +471,27 @@
     });
   }
 
-  /* ---------- Eventos ---------- */
+  /* ---------- Eventos (solo el botón "Agregar al pedido" reacciona) ---------- */
   function bind() {
     root.querySelectorAll("[data-ir]").forEach(function (b) {
       b.addEventListener("click", function () { irA(b.getAttribute("data-ir")); });
     });
 
-    root.querySelectorAll("[data-add]").forEach(function (card) {
-      card.addEventListener("click", function () {
-        var id = card.getAttribute("data-add");
-        var p = PRODUCTOS[id];
+    root.querySelectorAll("[data-add-btn]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var p = PRODUCTOS[btn.getAttribute("data-add-btn")];
         if (!p) return;
         Cart.add(p);
         toast("＋ " + p.nombre);
-        var btn = card.querySelector(".card__add");
-        if (btn) {
-          btn.classList.remove("pulse");
-          void btn.offsetWidth;
-          btn.classList.add("pulse");
-        }
+        btn.classList.remove("pulse");
+        void btn.offsetWidth;
+        btn.classList.add("pulse");
       });
     });
   }
 
   /* ---------- Cambios del carrito ---------- */
   Cart.onChange(function () {
-    root.querySelectorAll("[data-add]").forEach(function (card) {
-      var id = card.getAttribute("data-add");
-      var qty = Cart.qtyOf(id);
-      var badge = card.querySelector(".card__badge");
-      if (qty > 0) {
-        if (badge) badge.textContent = qty;
-        else {
-          var span = document.createElement("span");
-          span.className = "card__badge";
-          span.textContent = qty;
-          card.appendChild(span);
-        }
-      } else if (badge) {
-        badge.remove();
-      }
-    });
     renderCartbar();
     bumpCartbar();
     var drawer = document.getElementById("drawer");
