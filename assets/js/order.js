@@ -38,7 +38,7 @@ window.SCB_Order = (function () {
   function enviar(mesa, items, total) {
     var texto = textoComanda(mesa, items, total);
     var payload = {
-      _subject: "🍽️ Comanda Mesa " + mesa + " — " + cfg.NOMBRE_LOCAL,
+      _subject: "Comanda Mesa " + mesa + " — " + cfg.NOMBRE_LOCAL,
       mesa: String(mesa),
       hora: horaAhora(),
       local: cfg.NOMBRE_LOCAL,

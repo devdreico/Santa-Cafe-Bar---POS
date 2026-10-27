@@ -36,7 +36,9 @@ const SHELL = (base, mesa, section, sectionLabel) => `<!DOCTYPE html>
   <aside class="drawer" id="drawer" aria-label="Carrito">
     <div class="drawer__head">
       <h2>Tu pedido · Mesa ${mesa}</h2>
-      <button class="drawer__close" id="drawer-close" aria-label="Cerrar">✕</button>
+      <button class="drawer__close" id="drawer-close" aria-label="Cerrar">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
     <div class="drawer__body" id="drawer-body"></div>
     <div class="drawer__foot" id="drawer-foot"></div>
@@ -82,4 +84,4 @@ for (let mesa = 1; mesa <= MESAS; mesa++) {
   }
 }
 
-console.log(`✓ ${creadas} páginas generadas (${MESAS} mesas × ${SECTIONS.length} vistas)`);
+console.log(`[ok] ${creadas} páginas generadas (${MESAS} mesas × ${SECTIONS.length} vistas)`);

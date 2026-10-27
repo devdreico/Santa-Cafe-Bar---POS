@@ -9,7 +9,6 @@
 window.SCB_DATA = {
   comidas: {
     label: "Comidas",
-    emoji: "🍽️",
     paquetes: {
       label: "Paquetes",
       items: [
@@ -40,7 +39,6 @@ window.SCB_DATA = {
 
   bebidas: {
     label: "Bebidas",
-    emoji: "🥃",
     licores: {
       label: "Licores",
       cerveza: {
