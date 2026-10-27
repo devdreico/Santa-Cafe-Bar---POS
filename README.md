@@ -73,7 +73,7 @@ config.js                → Endpoint Formspree, moneda (COP), WhatsApp
    └── comidas/
 qr/index.html            → Generador/imprimible de QRs por mesa (staff)
 assets/
-   ├── css/styles.css     → tema espresso + dorado, mobile-first
+   ├── css/styles.css     → tema oscuro pastel, Montserrat, mobile-first
    ├── js/data.js         → catálogo simulado (precios COP)
    ├── js/cart.js         → carrito + autosuma (localStorage por mesa)
    ├── js/order.js        → comanda → Formspree (+ fallback)
